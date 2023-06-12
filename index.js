@@ -26,9 +26,29 @@ async function run() {
     await client.connect();
 
     const classesCollection = client.db("fluentifyDb").collection("courses");
+    const cartCollection = client.db("fluentifyDb").collection("carts");
 
+    // All Classes
     app.get("/classes", async (req, res) => {
       const result = await classesCollection.find().toArray();
+      res.send(result);
+    });
+
+    // --- cart collection ---
+    app.get("/carts", async (req, res) => {
+      const email = req.query.email;
+      if (!email) {
+        res.send([]);
+      }
+      const query = { email: email };
+      const result = await cartCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.post("/carts", async (req, res) => {
+      const item = req.body;
+      console.log(item);
+      const result = await cartCollection.insertOne(item);
       res.send(result);
     });
 

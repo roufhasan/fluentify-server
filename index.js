@@ -25,8 +25,16 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const usersCollection = client.db("fluentifyDb").collection("users");
     const classesCollection = client.db("fluentifyDb").collection("courses");
     const cartCollection = client.db("fluentifyDb").collection("carts");
+
+    // --- users api ---
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
 
     // All Classes
     app.get("/classes", async (req, res) => {

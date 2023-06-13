@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const port = process.env.PORT || 5000;
 
 //middleware
@@ -28,6 +29,14 @@ async function run() {
     const usersCollection = client.db("fluentifyDb").collection("users");
     const classesCollection = client.db("fluentifyDb").collection("courses");
     const cartCollection = client.db("fluentifyDb").collection("carts");
+
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1h",
+      });
+      res.send({ token });
+    });
 
     // --- users api ---
     app.get("/users", async (req, res) => {

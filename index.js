@@ -136,6 +136,15 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/myClasses", async (req, res) => {
+      let query = {};
+      if (req.query?.email) {
+        query = { instructorEmail: req.query.email };
+      }
+      const result = await classesCollection.find(query).toArray();
+      res.send(result);
+    });
+
     app.post("/classes", async (req, res) => {
       const newClass = req.body;
       const result = await classesCollection.insertOne(newClass);

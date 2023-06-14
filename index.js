@@ -139,6 +139,15 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/classes/sort", async (req, res) => {
+      const result = await classesCollection
+        .find()
+        .sort({ enrolled_student: -1 })
+        .limit(6)
+        .toArray();
+      res.send(result);
+    });
+
     // --- approve class api ---
     app.patch("/classes/approved/:id", async (req, res) => {
       const id = req.params.id;

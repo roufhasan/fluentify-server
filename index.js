@@ -102,6 +102,8 @@ async function run() {
       res.send(result);
     });
 
+    // --- make instructor api ---
+
     app.patch("/users/instructor/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -116,6 +118,7 @@ async function run() {
       res.send(result);
     });
 
+    // --- make admin api ---
     app.patch("/users/admin/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -130,9 +133,39 @@ async function run() {
       res.send(result);
     });
 
-    // All Classes
+    // --- All Classes ---
     app.get("/classes", async (req, res) => {
       const result = await classesCollection.find().toArray();
+      res.send(result);
+    });
+
+    // --- approve class api ---
+    app.patch("/classes/approved/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+
+      const updateDoc = {
+        $set: {
+          status: "approved",
+        },
+      };
+
+      const result = await classesCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    // --- deny class api ---
+    app.patch("/classes/denied/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+
+      const updateDoc = {
+        $set: {
+          status: "denied",
+        },
+      };
+
+      const result = await classesCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
 

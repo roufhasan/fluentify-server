@@ -66,6 +66,14 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/users/topinstructor", async (req, res) => {
+      const result = await usersCollection
+        .find({ role: "instructor" })
+        .limit(6)
+        .toArray();
+      res.send(result);
+    });
+
     app.post("/users", async (req, res) => {
       const user = req.body;
 

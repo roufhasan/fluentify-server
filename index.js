@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 require("dotenv").config();
+const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 const jwt = require("jsonwebtoken");
 const port = process.env.PORT || 5000;
 
@@ -51,11 +52,12 @@ async function run() {
     const usersCollection = client.db("fluentifyDb").collection("users");
     const classesCollection = client.db("fluentifyDb").collection("courses");
     const cartCollection = client.db("fluentifyDb").collection("carts");
+    const paymentsCollection = client.db("fluentifyDb").collection("payments");
 
     app.post("/jwt", (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "1h",
+        expiresIn: "7d",
       });
       res.send({ token });
     });
@@ -258,6 +260,28 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // --- create payment intent ---
+    app.post("/create-payment-intent", verifyJWT, async (req, res) => {
+      const { price } = req.body;
+      const amount = price * 100;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    });
+
+    // --- payment api ---
+    app.post("/payments", verifyJWT, async (req, res) => {
+      const payment = req.body;
+      const result = await paymentsCollection.insertOne(payment);
       res.send(result);
     });
 

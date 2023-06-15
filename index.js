@@ -279,6 +279,15 @@ async function run() {
     });
 
     // --- payment api ---
+    app.get("/payment", async (req, res) => {
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email };
+      }
+      const result = await paymentsCollection.find(query).toArray();
+      res.send(result);
+    });
+
     app.post("/payments", verifyJWT, async (req, res) => {
       const payment = req.body;
       const result = await paymentsCollection.insertOne(payment);

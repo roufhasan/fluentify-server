@@ -156,6 +156,13 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/classes/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await classesCollection.findOne(query);
+      res.send(result);
+    });
+
     // --- approve class api ---
     app.patch("/classes/approved/:id", async (req, res) => {
       const id = req.params.id;
@@ -192,6 +199,26 @@ async function run() {
         query = { instructorEmail: req.query.email };
       }
       const result = await classesCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.put("/updateClasses/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedClass = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const classes = {
+        $set: {
+          className: updatedClass.className,
+          price: updatedClass.price,
+          available_seats: updatedClass.available_seats,
+        },
+      };
+      const result = await classesCollection.updateOne(
+        filter,
+        classes,
+        options
+      );
       res.send(result);
     });
 
